@@ -14,7 +14,7 @@ import sys
 from distutils.spawn import find_executable
 
 from six import iteritems
-from whichcraft import which
+from shutil import which
 
 import bench
 from bench import env
