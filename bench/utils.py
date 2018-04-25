@@ -166,17 +166,6 @@ def exec_cmd(cmd, cwd='.'):
 	if return_code > 0:
 		raise CommandFailedError(cmd)
 
-def which(executable, raise_err = False):
-	from distutils.spawn import find_executable
-	exec_ = find_executable(executable)
-
-	if not exec_ and raise_err:
-		raise ValueError('{executable} not found.'.format(
-			executable = executable
-		))
-
-	return exec_
-
 
 def raise_executable_error(python):
 	raise ValueError(
