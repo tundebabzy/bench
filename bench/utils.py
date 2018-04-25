@@ -1,9 +1,23 @@
-import os, sys, shutil, subprocess, logging, itertools, requests, json, platform, select, pwd, grp, multiprocessing, hashlib
+import grp
+import itertools
+import json
+import logging
+import multiprocessing
+import os
+import platform
+import pwd
+import requests
+import select
+import shutil
+import subprocess
+import sys
 from distutils.spawn import find_executable
-import bench
-import semantic_version
-from bench import env
+from shutil import which
+
 from six import iteritems
+
+import bench
+from bench import env
 
 
 class PatchError(Exception):
@@ -163,15 +177,26 @@ def which(executable, raise_err = False):
 
 	return exec_
 
-def setup_env(bench_path='.', python = 'python'):
-	python = which(python, raise_err = True)
 
-	exec_cmd('virtualenv -q {} -p {}'.format('env', python), cwd=bench_path)
-	exec_cmd('./env/bin/pip -q install --upgrade pip==9.0.3', cwd=bench_path)
-	exec_cmd('./env/bin/pip -q install wheel', cwd=bench_path)
-	# exec_cmd('./env/bin/pip -q install https://github.com/frappe/MySQLdb1/archive/MySQLdb-1.2.5-patched.tar.gz', cwd=bench_path)
-	exec_cmd('./env/bin/pip -q install six', cwd=bench_path)
-	exec_cmd('./env/bin/pip -q install -e git+https://github.com/frappe/python-pdfkit.git#egg=pdfkit', cwd=bench_path)
+def raise_executable_error(python):
+	raise ValueError(
+		'No executable found for {python}'.format(python=python)
+	)
+
+
+def setup_env(bench_path='.', python='python'):
+	python = which(python)
+
+	if python:
+		exec_cmd('virtualenv -q {} -p {}'.format('env', python), cwd=bench_path)
+		exec_cmd('./env/bin/pip -q install --upgrade pip==9.0.3', cwd=bench_path)
+		exec_cmd('./env/bin/pip -q install wheel', cwd=bench_path)
+		exec_cmd('./env/bin/pip -q install six', cwd=bench_path)
+		exec_cmd('./env/bin/pip -q install -e git+https://github.com/frappe/python-pdfkit.git#egg=pdfkit',
+		         cwd=bench_path)
+	else:
+		raise_executable_error(python)
+
 
 def setup_socketio(bench_path='.'):
 	exec_cmd("npm install socket.io redis express superagent cookie babel-core less chokidar \
